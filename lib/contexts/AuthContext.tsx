@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'
+import { toast } from 'sonner'
 
 interface User {
   id: string
@@ -144,13 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`)
+    try {      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`)
       if (res.data.success) {
         setUser(null)
+        toast.success('Logged out successfully')
       }
     } catch (error) {
       console.error('Logout error:', error)
+      toast.error('Error during logout')
     } finally {
       // Clear auth state regardless of API call result
       document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
@@ -159,8 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const verifyEmail = async (email: string, otp: string) => {
-    try {
+  const verifyEmail = async (email: string, otp: string) => {    try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email`, {
         email,
         otp
@@ -170,9 +171,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(res.data.message)
       }
 
+      toast.success('Email verified successfully')
       return res.data
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Email verification failed')
+      const message = error.response?.data?.message || 'Email verification failed'
+      toast.error(message)
+      throw new Error(message)
     }
   }
 

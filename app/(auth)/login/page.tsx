@@ -8,18 +8,18 @@ import Link from "next/link"
 import { Loader2, LogIn, Facebook, Shield } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
 import { useAuth } from "@/lib/contexts/AuthContext"
+import { toast } from "sonner"
 
 export default function Page(): React.JSX.Element {
   const { login, loginWithOAuth } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isAdmin = searchParams.get('role') === 'admin'
-    const [isPending, startTransition] = React.useTransition()
+  const [isPending, startTransition] = React.useTransition()
   const [formData, setFormData] = React.useState({
     email: "",
     password: ""
   })
-  const [error, setError] = React.useState("")
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -28,26 +28,28 @@ export default function Page(): React.JSX.Element {
       [name]: value
     }))
   }, [])
+
   const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
     
     startTransition(async () => {
       try {
         await login(formData.email, formData.password, isAdmin)
+        toast.success("Login successful")
         // Redirect to appropriate dashboard
         router.push(isAdmin ? "/admin/dashboard" : "/dashboard")
       } catch (error: any) {
-        setError(error.message || "Failed to login")
+        toast.error(error.message || "Failed to login")
       }
     })
   }, [formData, login, router, isAdmin, startTransition])
+
   const handleGoogleLogin = React.useCallback(() => {
     startTransition(() => {
       try {
         loginWithOAuth('google', isAdmin)
       } catch (error: any) {
-        setError(error.message || "Failed to login with Google")
+        toast.error(error.message || "Failed to login with Google")
       }
     })
   }, [loginWithOAuth, isAdmin, startTransition])
@@ -57,7 +59,7 @@ export default function Page(): React.JSX.Element {
       try {
         loginWithOAuth('facebook', isAdmin)
       } catch (error: any) {
-        setError(error.message || "Failed to login with Facebook")
+        toast.error(error.message || "Failed to login with Facebook")
       }
     })
   }, [loginWithOAuth, isAdmin, startTransition])
@@ -92,15 +94,9 @@ export default function Page(): React.JSX.Element {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 p-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
-          
           <div className="space-y-2">
             <label className="text-gray-700 dark:text-gray-300 font-medium">
-              Email or Username
+              Email
             </label>
             <Input
               type="text"
@@ -126,7 +122,9 @@ export default function Page(): React.JSX.Element {
               className="placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-white dark:bg-gray-800"
               required
             />
-          </div>          <Button
+          </div>
+
+          <Button
             type="submit"
             className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
             disabled={isPending}
@@ -150,7 +148,8 @@ export default function Page(): React.JSX.Element {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">            <Button
+          <div className="grid grid-cols-2 gap-4">
+            <Button
               type="button"
               variant="outline"
               onClick={handleGoogleLogin}

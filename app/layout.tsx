@@ -38,7 +38,9 @@ export default function RootLayout({
           <div className="finex flex justify-center py-4">
             <NavigationMenuDemo />
           </div>
-          {children}
+          <div className="container pt-6">
+            {children}
+          </div>
         </Providers>
       </body>
     </html>

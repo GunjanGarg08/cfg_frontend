@@ -3,18 +3,18 @@
 import * as React from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Loader2, LogIn, Facebook } from "lucide-react"
+import { Loader2, LogIn, Facebook, Shield } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
 import { useAuth } from "@/lib/contexts/AuthContext"
 
 export default function Page(): React.JSX.Element {
   const { login, loginWithOAuth } = useAuth()
   const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false)
-  const [isFacebookLoading, setIsFacebookLoading] = React.useState(false)
+  const searchParams = useSearchParams()
+  const isAdmin = searchParams.get('role') === 'admin'
+    const [isPending, startTransition] = React.useTransition()
   const [formData, setFormData] = React.useState({
     email: "",
     password: ""
@@ -28,48 +28,67 @@ export default function Page(): React.JSX.Element {
       [name]: value
     }))
   }, [])
-
   const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    setIsLoading(true)
+    
+    startTransition(async () => {
+      try {
+        await login(formData.email, formData.password, isAdmin)
+        // Redirect to appropriate dashboard
+        router.push(isAdmin ? "/admin/dashboard" : "/dashboard")
+      } catch (error: any) {
+        setError(error.message || "Failed to login")
+      }
+    })
+  }, [formData, login, router, isAdmin, startTransition])
+  const handleGoogleLogin = React.useCallback(() => {
+    startTransition(() => {
+      try {
+        loginWithOAuth('google', isAdmin)
+      } catch (error: any) {
+        setError(error.message || "Failed to login with Google")
+      }
+    })
+  }, [loginWithOAuth, isAdmin, startTransition])
 
-    try {
-      await login(formData.email, formData.password)
-      router.push("/dashboard")
-    } catch (error: any) {
-      setError(error.message || "Failed to login")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [formData, login, router])
-
-  const handleGoogleLogin = React.useCallback(async () => {
-    setIsGoogleLoading(true)
-    try {
-      loginWithOAuth('google')
-    } catch (error: any) {
-      setError(error.message || "Failed to login with Google")
-      setIsGoogleLoading(false)
-    }
-  }, [loginWithOAuth])
-
-  const handleFacebookLogin = React.useCallback(async () => {
-    setIsFacebookLoading(true)
-    try {
-      loginWithOAuth('facebook')
-    } catch (error: any) {
-      setError(error.message || "Failed to login with Facebook")
-      setIsFacebookLoading(false)
-    }
-  }, [loginWithOAuth])
+  const handleFacebookLogin = React.useCallback(() => {
+    startTransition(() => {
+      try {
+        loginWithOAuth('facebook', isAdmin)
+      } catch (error: any) {
+        setError(error.message || "Failed to login with Facebook")
+      }
+    })
+  }, [loginWithOAuth, isAdmin, startTransition])
 
   return (
     <div className="flex w-full justify-center items-center min-h-screen py-8 px-4 bg-white text-black dark:bg-black dark:text-white transition-colors">
       <div className="w-full max-w-md p-6 md:p-8 pb-12 space-y-6 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-lg dark:shadow-blue-900/10">
         <div className="text-center py-4 space-y-2">
           <h1 className="text-4xl font-extrabold">NGO Platform</h1>
-          <p className="text-gray-600 dark:text-gray-400">Sign in to your account</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {isAdmin ? "Admin Sign In" : "Sign in to your account"}
+          </p>
+        </div>
+
+        {/* Role selector */}
+        <div className="flex justify-center gap-4">
+          <Button
+            variant={!isAdmin ? "default" : "outline"}
+            onClick={() => router.push('/login')}
+            className="flex-1"
+          >
+            User
+          </Button>
+          <Button
+            variant={isAdmin ? "default" : "outline"}
+            onClick={() => router.push('/login?role=admin')}
+            className="flex-1"
+          >
+            <Shield className="mr-2 h-4 w-4" />
+            Admin
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -107,14 +126,12 @@ export default function Page(): React.JSX.Element {
               className="placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-white dark:bg-gray-800"
               required
             />
-          </div>
-
-          <Button
+          </div>          <Button
             type="submit"
             className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading ? (
+            {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <LogIn className="mr-2 h-4 w-4" />
@@ -133,15 +150,14 @@ export default function Page(): React.JSX.Element {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Button
+          <div className="grid grid-cols-2 gap-4">            <Button
               type="button"
               variant="outline"
               onClick={handleGoogleLogin}
-              disabled={isGoogleLoading}
+              disabled={isPending}
               className="w-full dark:bg-gray-800"
             >
-              {isGoogleLoading ? (
+              {isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <FcGoogle className="mr-2 h-4 w-4" />
@@ -153,10 +169,10 @@ export default function Page(): React.JSX.Element {
               type="button"
               variant="outline"
               onClick={handleFacebookLogin}
-              disabled={isFacebookLoading}
+              disabled={isPending}
               className="w-full dark:bg-gray-800"
             >
-              {isFacebookLoading ? (
+              {isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Facebook className="mr-2 h-4 w-4 text-blue-600" />

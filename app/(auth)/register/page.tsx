@@ -3,15 +3,18 @@
 import * as React from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Loader2, UserPlus, Facebook } from "lucide-react"
+import { Loader2, UserPlus, Facebook, Shield } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
 import { useAuth } from "@/lib/contexts/AuthContext"
 
 export default function SignUpPage() {
   const { register, loginWithOAuth } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isAdmin = searchParams.get('role') === 'admin'
+
   const [isLoading, setIsLoading] = React.useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false)
   const [isFacebookLoading, setIsFacebookLoading] = React.useState(false)
@@ -43,41 +46,62 @@ export default function SignUpPage() {
     setIsLoading(true)
 
     try {
-      await register(formData.username, formData.email, formData.password)
-      router.push("/login?registered=true")
+      await register(formData.username, formData.email, formData.password, isAdmin)
+      router.push(`/login?role=${isAdmin ? 'admin' : 'user'}&registered=true`)
     } catch (error: any) {
       setError(error.message || "Registration failed")
     } finally {
       setIsLoading(false)
     }
-  }, [formData, register, router])
+  }, [formData, register, router, isAdmin])
 
   const handleGoogleLogin = React.useCallback(async () => {
     setIsGoogleLoading(true)
     try {
-      loginWithOAuth('google')
+      loginWithOAuth('google', isAdmin)
     } catch (error: any) {
       setError(error.message || "Failed to login with Google")
       setIsGoogleLoading(false)
     }
-  }, [loginWithOAuth])
+  }, [loginWithOAuth, isAdmin])
 
   const handleFacebookLogin = React.useCallback(async () => {
     setIsFacebookLoading(true)
     try {
-      loginWithOAuth('facebook')
+      loginWithOAuth('facebook', isAdmin)
     } catch (error: any) {
       setError(error.message || "Failed to login with Facebook")
       setIsFacebookLoading(false)
     }
-  }, [loginWithOAuth])
+  }, [loginWithOAuth, isAdmin])
 
   return (
     <div className="flex w-full justify-center items-center min-h-screen py-8 px-4 bg-white text-black dark:bg-black dark:text-white transition-colors">
       <div className="w-full max-w-md p-6 md:p-8 pb-12 space-y-6 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-lg dark:shadow-blue-900/10">
         <div className="text-center py-4 space-y-2">
           <h1 className="text-4xl font-extrabold">NGO Platform</h1>
-          <p className="text-gray-600 dark:text-gray-400">Create a new account</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {isAdmin ? "Create Admin Account" : "Create a new account"}
+          </p>
+        </div>
+
+        {/* Role selector */}
+        <div className="flex justify-center gap-4">
+          <Button
+            variant={!isAdmin ? "default" : "outline"}
+            onClick={() => router.push('/register')}
+            className="flex-1"
+          >
+            User
+          </Button>
+          <Button
+            variant={isAdmin ? "default" : "outline"}
+            onClick={() => router.push('/register?role=admin')}
+            className="flex-1"
+          >
+            <Shield className="mr-2 h-4 w-4" />
+            Admin
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">

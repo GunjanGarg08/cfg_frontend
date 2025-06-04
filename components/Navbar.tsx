@@ -88,9 +88,9 @@ export function NavigationMenuDemo() {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center justify-between w-full max-w-screen-xl mx-auto px-4 h-14">
-        <div className="flex items-center gap-4">
+    <div className="fixed flex  top-0 left-0 right-0 z-50  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex items-center justify-center w-full max-w-screen-xl mx-auto px-4 h-14">
+        <div className="flex  items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -237,6 +237,9 @@ export function NavigationMenuDemo() {
           </NavigationMenu>
         </div>
         
+        
+      </div>
+      <div className="p-2">
         <Button
           variant="ghost"
           size="icon"

@@ -11,11 +11,11 @@ export function Footer() {
   return (
     <footer className="w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
       {/* Contact Form and Map Section */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Google Map */}
           <div className="h-[410px] rounded-lg overflow-hidden">
-            <h1 className="text-2xl p-2 font-semibold">Google Map</h1>
+            <h1 className="text-2xl p-2 font-semibold">Find Us on the Map</h1>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.8674621685145!2d72.86077757449!3d19.069564052175963!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c8e5623312cf%3A0x36e3f54356fe89db!2sJP%20Morgan%20Chase%20Bank!5e0!3m2!1sen!2sin!4v1749121641740!5m2!1sen!2sin"
               width="100%"

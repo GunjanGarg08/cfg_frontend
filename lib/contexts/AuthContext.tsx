@@ -22,6 +22,7 @@ interface AuthContextType {
   register: (username: string, email: string, password: string, isAdmin?: boolean) => Promise<void>
   logout: () => Promise<void>
   verifyEmail: (email: string, otp: string) => Promise<void>
+  resendOTP: (email: string) => Promise<any>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -159,24 +160,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       delete axios.defaults.headers.common['Authorization']
       setUser(null)
     }
-  }
-
-  const verifyEmail = async (email: string, otp: string) => {    try {
+  };
+  
+  const verifyEmail = async (email: string, otp: string) => {    
+    try {
+      // Trim the OTP to remove any whitespace
+      const cleanOTP = otp.trim()
+      
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email`, {
         email,
-        otp
+        otp: cleanOTP
       })
 
       if (!res.data.success) {
         throw new Error(res.data.message)
       }
 
-      toast.success('Email verified successfully')
+      // Don't show toast here, let the component handle it
       return res.data
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Email verification failed'
-      toast.error(message)
-      throw new Error(message)
+      // Handle axios errors specifically
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        const message = error.response.data.message || 'Invalid or expired OTP'
+        throw new Error(message)
+      } else if (error.request) {
+        // The request was made but no response was received
+        throw new Error('Network error. Please try again.')
+      } else {
+        // Something happened in setting up the request
+        throw new Error('Failed to verify email. Please try again.')
+      }
+    }
+  }
+  const resendOTP = async (email: string) => {
+    try {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/resend-verification`, { email })
+      
+      if (!res.data.success) {
+        throw new Error(res.data.message)
+      }
+
+      return res.data
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Failed to resend OTP')
+      } else if (error.request) {
+        throw new Error('Network error. Please try again.')
+      } else {
+        throw new Error('Failed to resend OTP. Please try again.')
+      }
     }
   }
 
@@ -186,6 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       loginWithOAuth,
       login,
+      resendOTP,
       register,
       logout,
       verifyEmail

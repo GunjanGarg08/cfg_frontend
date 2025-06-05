@@ -1,12 +1,9 @@
-"use client"
-
 import Link from "next/link"
 import { HeartHandshake, Mail, Globe, Facebook, Twitter, Instagram } from "lucide-react"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
+import { ContactForm } from "./ContactForm"
+import { CopyrightNotice } from "./CopyrightNotice"
 
 export function Footer() {
-    const currentYear = new Date().getFullYear()
 
     return (
         <footer className="w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
@@ -27,46 +24,10 @@ export function Footer() {
                             title="NGO Location"
                             className="rounded-lg "
                         ></iframe>
-                    </div>
-
-                    {/* Contact Form */}
-                    <div className=" rounded-lg p-6 ">
+                    </div>                    {/* Contact Form */}
+                    <div className="rounded-lg p-6">
                         <h2 className="text-2xl font-semibold mb-6">Contact Us</h2>
-                        <form className="space-y-4">
-                            <div>
-                                <Input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Your Name"
-                                    className="w-full px-4 py-2 rounded-md border border-border bg-background/50"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <Input
-                                    type="email"
-                                    name="email"
-                                    placeholder="Your Email"
-                                    className="w-full px-4 py-2 rounded-md border border-border bg-background/50"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <textarea
-                                    placeholder="Your message"
-                                    name="message"
-                                    rows={6}
-                                    className="w-full px-4 py-2 rounded-md border border-border bg-background/50"
-                                    required
-                                ></textarea>
-                            </div>
-                            <Button
-                                type="submit"
-                                className=""
-                            >
-                                SEND MESSAGE
-                            </Button>
-                        </form>
+                        <ContactForm />
                     </div>
                 </div>
             </div>
@@ -214,9 +175,7 @@ export function Footer() {
                     {/* Bottom Section */}
                     <div className="mt-8 pt-6 border-t">
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                            <p className="text-sm text-muted-foreground text-center md:text-left">
-                                © {currentYear} NGO Platform. All rights reserved.
-                            </p>
+                            <CopyrightNotice />
                             <div className="flex gap-4 text-sm text-muted-foreground">
                                 <Link href="/privacy" className="hover:text-foreground transition-colors">
                                     Privacy Policy

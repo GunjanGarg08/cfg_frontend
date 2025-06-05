@@ -11,10 +11,18 @@ import { useAuth } from "@/lib/contexts/AuthContext"
 import { toast } from "sonner"
 
 export default function Page(): React.JSX.Element {
-  const { login, loginWithOAuth } = useAuth()
+  const { user, login, loginWithOAuth } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isAdmin = searchParams.get('role') === 'admin'
+
+  // Redirect if user is already logged in
+  React.useEffect(() => {
+    if (user) {
+      const redirectPath = user.role === 'admin' ? '/admin/dashboard' : '/dashboard'
+      router.replace(redirectPath)
+    }
+  }, [user, router])
   const [isPending, startTransition] = React.useTransition()
   const [formData, setFormData] = React.useState({
     email: "",
@@ -65,8 +73,8 @@ export default function Page(): React.JSX.Element {
   }, [loginWithOAuth, isAdmin, startTransition])
 
   return (
-    <div className="flex w-full justify-center items-center min-h-screen py-8 px-4 bg-white text-black dark:bg-black dark:text-white transition-colors">
-      <div className="w-full max-w-md p-6 md:p-8 pb-12 space-y-6 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-lg dark:shadow-blue-900/10">
+    <div className="flex w-full justify-center items-center min-h-screen py-8 px-4 bg-white text-black dark:bg-black  dark:text-white transition-colors">
+      <div className="w-full border border-gray-800 max-w-md p-6 md:p-8 pb-12 space-y-6 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-lg dark:shadow-blue-900/10">
         <div className="text-center py-4 space-y-2">
           <h1 className="text-4xl font-extrabold">NGO Platform</h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -122,9 +130,7 @@ export default function Page(): React.JSX.Element {
               className="placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-white dark:bg-gray-800"
               required
             />
-          </div>
-
-          <Button
+          </div>          <Button
             type="submit"
             className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
             disabled={isPending}
@@ -137,48 +143,52 @@ export default function Page(): React.JSX.Element {
             Sign In
           </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300 dark:border-gray-600" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-gray-50 dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">
-                Or continue with
-              </span>
-            </div>
-          </div>
+          {!isAdmin && (
+            <>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-300 dark:border-gray-600" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-gray-50 dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGoogleLogin}
-              disabled={isPending}
-              className="w-full dark:bg-gray-800"
-            >
-              {isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <FcGoogle className="mr-2 h-4 w-4" />
-              )}
-              Google
-            </Button>
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGoogleLogin}
+                  disabled={isPending}
+                  className="w-full dark:bg-gray-800"
+                >
+                  {isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <FcGoogle className="mr-2 h-4 w-4" />
+                  )}
+                  Google
+                </Button>
 
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleFacebookLogin}
-              disabled={isPending}
-              className="w-full dark:bg-gray-800"
-            >
-              {isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Facebook className="mr-2 h-4 w-4 text-blue-600" />
-              )}
-              Facebook
-            </Button>
-          </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleFacebookLogin}
+                  disabled={isPending}
+                  className="w-full dark:bg-gray-800"
+                >
+                  {isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Facebook className="mr-2 h-4 w-4 text-blue-600" />
+                  )}
+                  Facebook
+                </Button>
+              </div>
+            </>
+          )}
 
           <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
             Don't have an account?{" "}

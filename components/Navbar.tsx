@@ -88,7 +88,7 @@ export function NavigationMenuDemo() {
   }
 
   return (
-    <div className="fixed flex top-0 left-0 right-0 z-50 bg-background backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="fixed flex top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center justify-between w-full max-w-screen-xl mx-auto px-4 h-14">
         {/* Logo/Brand - Add your logo here */}
         <div className="flex items-center gap-2">
@@ -226,10 +226,11 @@ export function NavigationMenuDemo() {
                     </li>
                   </ul>
                 </NavigationMenuContent>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/donate">Donate</Link>
-                </NavigationMenuLink>
+                
               </NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                  <Link href="/donate" className="text-white hover:text-white bg-red-600 hover:bg-red-700 ">Donate</Link>
+                </NavigationMenuLink>
             </NavigationMenuList>
           </NavigationMenu>
         </div>

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { NavigationMenuDemo } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
+import { Footer } from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,11 +37,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="finex flex justify-center py-4">
-            <NavigationMenuDemo />
-          </div>
-          <div className="container pt-6">
-            {children}
+          <div className="min-h-screen flex flex-col">
+            <div className="finex flex justify-center py-4">
+              <NavigationMenuDemo />
+            </div>
+            <main className="flex-grow container pt-6">
+              {children}
+            </main>
+            <Footer />
           </div>
           <Toaster />
         </Providers>

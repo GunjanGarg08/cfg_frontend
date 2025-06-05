@@ -267,12 +267,12 @@ export function NavigationMenuDemo() {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[3.5rem] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transform transition-all duration-300 ease-in-out ${
+        className={`md:hidden fixed  inset-x-0 top-[3.5rem] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 border-b transform transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
         <nav className="max-w-screen-xl mx-auto">
-          <div className="flex flex-col py-4 px-4 space-y-1">
+          <div className="flex flex justify-center items-center  flex-col py-4 px-4 space-y-1">
             <Link
               href="/"
               className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"

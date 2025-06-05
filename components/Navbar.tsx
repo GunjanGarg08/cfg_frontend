@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
-import { CircleCheckIcon, CircleHelpIcon, CircleIcon, HeartHandshakeIcon, UsersIcon, GlobeIcon, Moon, Sun, Menu } from "lucide-react"
+import { CircleCheckIcon, CircleHelpIcon, CircleIcon, HeartHandshakeIcon, UsersIcon, GlobeIcon, Moon, Sun, Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -88,36 +88,29 @@ export function NavigationMenuDemo() {
   }
 
   return (
-    <div className="fixed flex  top-0 left-0 right-0 z-50  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center justify-center w-full max-w-screen-xl mx-auto px-4 h-14">
-        <div className="flex  items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-          <NavigationMenu viewport={false} className="hidden md:flex">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex items-center justify-between w-full max-w-screen-xl mx-auto px-4 h-14">
+        {/* Logo/Brand - Add your logo here */}
+        <div className="flex items-center gap-2">
+          <HeartHandshakeIcon className="h-6 w-6" />
+          <span className="font-semibold hidden sm:inline">NGO Platform</span>
+        </div>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center flex-1 justify-center">
+          <NavigationMenu>
             <NavigationMenuList className="gap-2">
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Home</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                  <ul className="grid gap-2 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                     <li className="row-span-3">
                       <NavigationMenuLink asChild>
-                        <a
-                          className="from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md bg-gradient-to-b p-6 no-underline outline-none select-none focus:shadow-md"
-                          href="/"
-                        >
+                        <a className="from-muted/50 to-muted flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b p-6 no-underline outline-none focus:shadow-md" href="/">
                           <HeartHandshakeIcon className="h-6 w-6 mb-2" />
-                          <div className="mt-4 mb-2 text-lg font-medium">
-                            NGO Platform
-                          </div>
+                          <div className="mt-4 mb-2 text-lg font-medium">NGO Platform</div>
                           <p className="text-muted-foreground text-sm leading-tight">
-                            Making a difference in communities through sustainable development and empowerment.
+                            Making a difference in communities through sustainable development.
                           </p>
                         </a>
                       </NavigationMenuLink>
@@ -154,6 +147,7 @@ export function NavigationMenuDemo() {
                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                   <Link href="/about">About Us</Link>
                 </NavigationMenuLink>
+                
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Get Involved</NavigationMenuTrigger>
@@ -232,51 +226,105 @@ export function NavigationMenuDemo() {
                     </li>
                   </ul>
                 </NavigationMenuContent>
+                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                  <Link href="/donate">Donate</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        
-        
-      </div>
-      <div className="p-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          className="h-9 w-9"
-        >
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            className="h-9 w-9"
+          >
+            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t bg-background">
-          <nav className="flex flex-col p-4 space-y-2">
-            <Link href="/" className="px-4 py-2 hover:bg-accent rounded-md">
+      <div
+        className={`md:hidden fixed inset-x-0 top-[3.5rem] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transform transition-all duration-300 ease-in-out ${
+          isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
+        <nav className="max-w-screen-xl mx-auto">
+          <div className="flex flex-col py-4 px-4 space-y-1">
+            <Link
+              href="/"
+              className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Home
             </Link>
-            <Link href="/programs" className="px-4 py-2 hover:bg-accent rounded-md">
+            <Link
+              href="/programs"
+              className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Programs & Initiatives
             </Link>
-            <Link href="/about" className="px-4 py-2 hover:bg-accent rounded-md">
+            <Link
+              href="/about"
+              className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               About Us
             </Link>
-            <Link href="/get-involved" className="px-4 py-2 hover:bg-accent rounded-md">
+            <Link
+              href="/donate"
+              className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Donate
+            </Link>
+            <Link
+              href="/get-involved"
+              className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Get Involved
             </Link>
-            <Link href="/resources" className="px-4 py-2 hover:bg-accent rounded-md">
+            <Link
+              href="/resources"
+              className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Resources
             </Link>
-            <Link href="/impact" className="px-4 py-2 hover:bg-accent rounded-md">
+            <Link
+              href="/impact"
+              className="px-4 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Impact Dashboard
             </Link>
-          </nav>
-        </div>
-      )}
+          </div>
+        </nav>
+      </div>
     </div>
   )
 }
